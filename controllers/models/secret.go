@@ -29,12 +29,13 @@ import (
 )
 
 type SecretModel struct {
-	Name         string
-	Namespace    string
-	TunnelToken  string
-	AccountTag   string
-	TunnelSecret string
-	TunnelID     string
+	Name              string
+	Namespace         string
+	TunnelToken       string
+	AccountTag        string
+	TunnelSecret      string
+	TunnelID          string
+	OriginCertificate string
 }
 
 type tunnelToken struct {
@@ -64,6 +65,7 @@ func (s *SecretModel) GetSecret() (*corev1.Secret, error) {
 		},
 		StringData: map[string]string{
 			s.TunnelID + ".json": secret,
+			"cert.pem":           s.OriginCertificate,
 		},
 		Type: corev1.SecretTypeOpaque,
 	}, nil

@@ -18,7 +18,8 @@ package templates
 
 const CONFIG = `
 tunnel: {{ .TunnelID }}
-credentials-file: /root/.cloudflared/{{ .TunnelID }}.json
+credentials-file: {{ .ConfigsDir }}/{{ .TunnelID }}.json
+origincert: {{ .ConfigsDir }}/cert.pem
 warp-routing:
   enabled: true
 ingress:

@@ -30,6 +30,7 @@ type DeploymentModel struct {
 	Replicas        int32
 	TunnelID        string
 	Image           string
+	ConfigsDir      string
 	ImagePullPolicy corev1.PullPolicy
 	Command         []string
 	Args            []string
@@ -54,7 +55,13 @@ func (d *DeploymentModel) GetDeployment() *appsv1.Deployment {
 	if len(d.Command) != 0 {
 		command = d.Command
 	}
-	args := []string{"tunnel", "--metrics", "localhost:9090", "--no-autoupdate", "run"}
+	args := []string{
+		"tunnel",
+		"--metrics", "localhost:9090",
+		"--config", d.ConfigsDir + "/config.yaml",
+		"--no-autoupdate",
+		"run",
+	}
 	if len(d.Args) != 0 {
 		args = d.Args
 	}
@@ -99,13 +106,18 @@ func (d *DeploymentModel) GetDeployment() *appsv1.Deployment {
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									Name:      "cloudflared-config",
-									MountPath: "/root/.cloudflared/config.yaml",
+									MountPath: d.ConfigsDir + "/config.yaml",
 									SubPath:   "config.yaml",
 								},
 								{
 									Name:      "cloudflared-creds",
-									MountPath: "/root/.cloudflared/" + d.TunnelID + ".json",
+									MountPath: d.ConfigsDir + "/" + d.TunnelID + ".json",
 									SubPath:   d.TunnelID + ".json",
+								},
+								{
+									Name:      "cloudflared-creds",
+									MountPath: d.ConfigsDir + "/cert.pem",
+									SubPath:   "cert.pem",
 								},
 							},
 						},

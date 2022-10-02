@@ -28,11 +28,12 @@ import (
 )
 
 type ConfigMapModel struct {
-	Name      string
-	Namespace string
-	Service   string
-	TunnelID  string
-	Domain    string
+	Name       string
+	Namespace  string
+	Service    string
+	TunnelID   string
+	Domain     string
+	ConfigsDir string
 }
 
 func ConfigMap(model ConfigMapModel) *ConfigMapModel {
