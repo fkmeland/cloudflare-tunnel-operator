@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	cloudflaretunneloperatorv1alpha1 "github.com/beezlabs-org/cloudflare-tunnel-operator/api/v1alpha1"
+	cloudflaretunneloperatorv1alpha2 "github.com/beezlabs-org/cloudflare-tunnel-operator/api/v1alpha2"
 	"github.com/beezlabs-org/cloudflare-tunnel-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
@@ -45,6 +46,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(cloudflaretunneloperatorv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(cloudflaretunneloperatorv1alpha2.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 

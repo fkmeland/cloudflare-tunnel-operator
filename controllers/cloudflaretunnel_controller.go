@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	cfv1 "github.com/beezlabs-org/cloudflare-tunnel-operator/api/v1alpha1"
+	cfv2 "github.com/beezlabs-org/cloudflare-tunnel-operator/api/v1alpha2"
 	"github.com/beezlabs-org/cloudflare-tunnel-operator/controllers/constants"
 	"github.com/beezlabs-org/cloudflare-tunnel-operator/controllers/models"
 )
@@ -50,7 +50,7 @@ type CloudflareTunnelReconciler struct {
 }
 
 type TunnelExpanded struct {
-	TunSpec           cfv1.CloudflareTunnelSpec
+	TunSpec           cfv2.CloudflareTunnelSpec
 	CloudflareAPI     *cloudflare.API
 	AccountToken      string // contains the token for the cloudflare account
 	AccountTag        string // contains the user id/tag for the cloudflare account
@@ -71,7 +71,7 @@ func (r *CloudflareTunnelReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	lfc.Info("Reconciling...")
 	namespacedName := req.NamespacedName
 
-	var cloudflareTunnel cfv1.CloudflareTunnel
+	var cloudflareTunnel cfv2.CloudflareTunnel
 	if err := r.Client.Get(ctx, namespacedName, &cloudflareTunnel); err != nil {
 		lfc.Error(err, "could not fetch CloudflareTunnel")
 		return ctrl.Result{}, err
@@ -133,7 +133,7 @@ func (r *CloudflareTunnelReconciler) Reconcile(ctx context.Context, req ctrl.Req
 // SetupWithManager sets up the controller with the Manager.
 func (r *CloudflareTunnelReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&cfv1.CloudflareTunnel{}).
+		For(&cfv2.CloudflareTunnel{}).
 		//Owns(&appsv1.Deployment{}).
 		Complete(r)
 }
@@ -316,7 +316,7 @@ func (r *CloudflareTunnelReconciler) createDNSCNAME(ctx context.Context) error {
 	return nil
 }
 
-func (r *CloudflareTunnelReconciler) createSecret(ctx context.Context, cloudflareTunnel cfv1.CloudflareTunnel) (*corev1.Secret, error) {
+func (r *CloudflareTunnelReconciler) createSecret(ctx context.Context, cloudflareTunnel cfv2.CloudflareTunnel) (*corev1.Secret, error) {
 	// now first we create the secret containing the creds to the tunnel
 	// this is fully contained in the fetched tunnel secret including the tunnel id and account tag
 	var secretFetch corev1.Secret
@@ -359,7 +359,7 @@ func (r *CloudflareTunnelReconciler) createSecret(ctx context.Context, cloudflar
 	return secretCreate, nil
 }
 
-func (r *CloudflareTunnelReconciler) createConfigMap(ctx context.Context, cloudflareTunnel cfv1.CloudflareTunnel, url string) (*corev1.ConfigMap, error) {
+func (r *CloudflareTunnelReconciler) createConfigMap(ctx context.Context, cloudflareTunnel cfv2.CloudflareTunnel, url string) (*corev1.ConfigMap, error) {
 	// now first we create the configMap containing the configuration to the tunnel
 	var configMapFetch corev1.ConfigMap
 	configMapCreate, err := models.ConfigMap(models.ConfigMapModel{
@@ -368,6 +368,7 @@ func (r *CloudflareTunnelReconciler) createConfigMap(ctx context.Context, cloudf
 		Service:    url,
 		TunnelID:   r.TunEx.TunnelID,
 		Domain:     r.TunEx.TunSpec.Domain,
+		OriginRequest: r.TunEx.TunSpec.Service.OriginRequest,
 		ConfigsDir: constants.ConfigsDir,
 	}).GetConfigMap()
 	if err != nil {
@@ -402,7 +403,7 @@ func (r *CloudflareTunnelReconciler) createConfigMap(ctx context.Context, cloudf
 	return configMapCreate, nil
 }
 
-func (r *CloudflareTunnelReconciler) createDeployment(ctx context.Context, cloudflareTunnel cfv1.CloudflareTunnel, secret *corev1.Secret, configMap *corev1.ConfigMap) (*appsv1.Deployment, error) {
+func (r *CloudflareTunnelReconciler) createDeployment(ctx context.Context, cloudflareTunnel cfv2.CloudflareTunnel, secret *corev1.Secret, configMap *corev1.ConfigMap) (*appsv1.Deployment, error) {
 	// now first we create the configMap containing the configuration to the tunnel
 	var deploymentFetch appsv1.Deployment
 
@@ -498,17 +499,17 @@ func (r *CloudflareTunnelReconciler) getTargetURL(ctx context.Context) (string, 
 	return r.TunEx.TunSpec.Service.Protocol + "://" + r.TunEx.TunSpec.Service.Name + "." + r.TunEx.TunSpec.Service.Namespace + ":" + strconv.Itoa(int(r.TunEx.TunSpec.Service.Port)), nil
 }
 
-func (r *CloudflareTunnelReconciler) updateStatus(ctx context.Context, cloudflareTunnel *cfv1.CloudflareTunnel) error {
+func (r *CloudflareTunnelReconciler) updateStatus(ctx context.Context, cloudflareTunnel *cfv2.CloudflareTunnel) error {
 	accountResourceContainer := cloudflare.AccountIdentifier(r.TunEx.CloudflareAPI.AccountID)
 	tunnelConnections, err := r.TunEx.CloudflareAPI.TunnelConnections(ctx, accountResourceContainer, r.TunEx.TunnelID)
 	if err != nil {
 		r.logger.Error(err, "could not fetch tunnel connections")
 		return err
 	}
-	var connections []cfv1.CloudflareTunnelConnections
+	var connections []cfv2.CloudflareTunnelConnections
 	for _, connectionMeta := range tunnelConnections { // 0 index since it will always return a single tunnel
 		for _, connection := range connectionMeta.Connections {
-			connections = append(connections, cfv1.CloudflareTunnelConnections{
+			connections = append(connections, cfv2.CloudflareTunnelConnections{
 				ConnectorID:  connectionMeta.ID,
 				Created:      metav1.Time{Time: *connectionMeta.RunAt},
 				Architecture: connectionMeta.Arch,
@@ -518,7 +519,7 @@ func (r *CloudflareTunnelReconciler) updateStatus(ctx context.Context, cloudflar
 			})
 		}
 	}
-	cloudflareTunnel.Status = cfv1.CloudflareTunnelStatus{
+	cloudflareTunnel.Status = cfv2.CloudflareTunnelStatus{
 		TunnelID:    r.TunEx.TunnelID,
 		Connections: connections,
 	}

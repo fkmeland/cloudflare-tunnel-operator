@@ -26,4 +26,7 @@ ingress:
   - service: {{ .Service }}
     originRequest:
       originServerName: {{ .Domain }}
+      {{- range .OriginRequest }}
+      {{ .Name }}: {{ .Value }}
+      {{- end }}
 `
