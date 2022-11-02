@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - 'VERSION'
+      - "VERSION"
 
 jobs:
   generate-version:
@@ -43,7 +43,7 @@ jobs:
           pull: true
           push: true
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-          tags: ghcr.io/beezlabs-org/${{ github.event.repository.name }}:${{ needs.generate-version.outputs.version }}
+          tags: ghcr.io/fkmeland/${{ github.event.repository.name }}:${{ needs.generate-version.outputs.version }}
 
   create-release:
     needs:

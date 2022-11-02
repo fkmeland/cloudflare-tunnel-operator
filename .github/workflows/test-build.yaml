@@ -18,7 +18,7 @@ jobs:
 
       - name: Check if protected files have been edited
         if: ${{ github.event_name == 'pull_request' }}
-        uses:  beezlabs-org/prevent-file-change@v1
+        uses: beezlabs-org/prevent-file-change@v1
         with:
           pattern: '^\.github\/.*|^VERSION$'
 
@@ -30,7 +30,7 @@ jobs:
       - name: Checkout and Install Dependencies
         uses: beezlabs-org/go-chkout-dep@v1
         with:
-          go: '1.17'
+          go: "1.17"
 
       - name: Build Production
         run: |
@@ -61,4 +61,4 @@ jobs:
           pull: true
           push: true
           platforms: linux/amd64,linux/arm64,linux/arm/v7
-          tags: ghcr.io/beezlabs-org/${{ github.event.repository.name }}:build-${{ github.sha }}
+          tags: ghcr.io/fkmeland/${{ github.event.repository.name }}:build-${{ github.sha }}
