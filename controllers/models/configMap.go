@@ -25,14 +25,17 @@ import (
 
 	"github.com/beezlabs-org/cloudflare-tunnel-operator/controllers/constants"
 	"github.com/beezlabs-org/cloudflare-tunnel-operator/controllers/templates"
+	cfv2 "github.com/beezlabs-org/cloudflare-tunnel-operator/api/v1alpha2"
 )
 
 type ConfigMapModel struct {
-	Name      string
-	Namespace string
-	Service   string
-	TunnelID  string
-	Domain    string
+	Name       string
+	Namespace  string
+	Service    string
+	TunnelID   string
+	Domain     string
+	ConfigsDir string
+	OriginRequest []*cfv2.CloudflareTunnelServiceOriginRequest
 }
 
 func ConfigMap(model ConfigMapModel) *ConfigMapModel {
