@@ -81,21 +81,20 @@ helm install my-cloudflare-tunnel-operator beezlabs/cloudflare-tunnel-operator -
     ```
 2. Create an API token in cloudflare which has access to all Zones and the DNS.
 3. Apply the examples updating the resources where needed
-```sh
-kubectl apply -f examples/sampleTunnel/
-kubectl apply -f examples/secret/
-```
-2. Check CloudflareTunnel object
-```console
-kubectl get cloudflaretunnel -A
-NAMESPACE    NAME            AGE
-cloudflare   sample-tunnel   3d21h
-```
-
-3. Access the URL that is set as domain
-```bash
-https://example.sayakm.me
-```
+   ```sh
+   kubectl apply -f examples/sampleTunnel/
+   kubectl apply -f examples/secret/
+   ```
+4. Check CloudflareTunnel object
+   ```console
+   kubectl get cloudflaretunnel -A
+   NAMESPACE    NAME            AGE
+   cloudflare   sample-tunnel   3d21h
+   ```
+5. Access the URL that is set as domain
+   ```bash
+   https://example.sayakm.me
+   ```
 
 ## Values
 
@@ -185,7 +184,7 @@ Sayak Mukhopadhyay - [SayakMukhopadhyay](https://github.com/SayakMukhopadhyay) -
 [artifact-hub-url]: https://artifacthub.io/packages/helm/beezlabs/cloudflare-tunnel-operator
 [go-shield]: https://shields.beezlabs.app/static/v1?label=Go&message=v1.17&color=007ec6&style=for-the-badge
 [go-url]: https://go.dev/
-[app-version-shield]: https://shields.beezlabs.app/static/v1?label=App%20Version&message=v0.1.0&color=007ec6&style=for-the-badge
+[app-version-shield]: https://shields.beezlabs.app/static/v1?label=App%20Version&message=v0.2.0&color=007ec6&style=for-the-badge
 [app-version-url]: https://github.com/beezlabs-org/cloudflare-tunnel-operator/releases/latest
-[chart-version-shield]: https://shields.beezlabs.app/static/v1?label=Chart%20Version&message=0.1.0&color=007ec6&style=for-the-badge
+[chart-version-shield]: https://shields.beezlabs.app/static/v1?label=Chart%20Version&message=0.2.0&color=007ec6&style=for-the-badge
 [chart-version-url]: https://github.com/beezlabs-org/cloudflare-tunnel-operator/releases/latest
